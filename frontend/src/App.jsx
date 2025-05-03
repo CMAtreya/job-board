@@ -1,5 +1,5 @@
-import Reach from 'react';
-import LandingPage from './pages/landingpage';
+import React from 'react';
+import LandingPage from './pages/auth/landingpage';
 
 function App() {
   return (
