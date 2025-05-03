@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/landingpage.css'; // Import your CSS file here
+import '../../styles/auth/landingpage.css'; // Import your CSS file here
 
 // Header Component
 const Header = () => {
