@@ -1,1 +1,1 @@
-# job_finder
+# job-board
