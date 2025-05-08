@@ -71,39 +71,6 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Organization login
-router.post('/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    
-    // Find organization by email
-    const organization = await Organization.findOne({ email });
-    if (!organization) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
-    
-    // Verify password
-    const isMatch = await bcrypt.compare(password, organization.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
-    
-    // Generate JWT token
-    const token = jwt.sign({ id: organization._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
-    
-    res.json({
-      message: 'Login successful',
-      token,
-      organization: {
-        id: organization._id,
-        name: organization.name,
-        email: organization.email
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Login failed', error: error.message });
-  }
-});
 
 // Get organization profile
 router.get('/profile', authOrg, async (req, res) => {

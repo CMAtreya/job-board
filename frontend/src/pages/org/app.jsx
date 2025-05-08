@@ -1,27 +1,30 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Dashboard from './Dashboard';
-import DashboardHome from './DashboardHome';
 import Profile from './Profile';
-import Jobs from './Jobs';
-import JobForm from './JobForm';
-import Applications from './Applications';
+import JobManagement from './JobManagement';
+import CreateJob from './createjob';
+import EditJob from './editjob';
+import DeleteJob from './deletejob';
+import JobApplicants from './JobApplicants';
+import Register from './register';
 
-const OrgApp = () => {
+export default function Orgapp() {
   return (
-    <Routes>
-      <Route path="/" element={<Dashboard />}>
-        <Route index element={<DashboardHome />} />
-        <Route path="dashboard" element={<DashboardHome />} />
-        <Route path="profile" element={<Profile />} />
-        <Route path="jobs" element={<Jobs />} />
-        <Route path="job/new" element={<JobForm />} />
-        <Route path="job/edit/:id" element={<JobForm />} />
-        <Route path="applications" element={<Applications />} />
-        <Route path="applications/:jobId" element={<Applications />} />
-      </Route>
-    </Routes>
+    <Router>
+      <div className="org-app-container">
+        <Routes>
+          <Route path="/" element={<Register />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/jobmangement" element={<JobManagement />} />
+          <Route path="/jobs" element={<JobManagement />} />
+          <Route path="/createjob" element={<CreateJob />} />
+          <Route path="/editjob/:id" element={<EditJob />} />
+          <Route path="/deletejob/:id" element={<DeleteJob />} />
+          <Route path="/job-applicants/:jobId" element={<JobApplicants />} />
+        </Routes>
+      </div>
+    </Router>
   );
-};
-
-export default OrgApp;
+}

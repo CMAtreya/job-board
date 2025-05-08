@@ -1,167 +1,369 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { FaFilter, FaSearch, FaChevronDown, FaChevronUp, FaEye, FaCheck, FaTimes, FaSort } from 'react-icons/fa';
+import Layout from './components/Layout';
+import '../../styles/org/applications.css';
 
 const Applications = () => {
-  const { jobId } = useParams();
-  const [applications, setApplications] = useState([]);
-  const [jobs, setJobs] = useState([]);
-  const [selectedJobId, setSelectedJobId] = useState(jobId || '');
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // Mock data - in a real app, this would come from API
+  const [applications, setApplications] = useState([
+    {
+      id: 1,
+      jobTitle: 'Frontend Developer',
+      applicantName: 'John Smith',
+      email: 'john.smith@example.com',
+      appliedDate: '2023-06-20',
+      status: 'pending',
+      resumeUrl: '#',
+      coverLetter: 'I am excited to apply for this position...'
+    },
+    {
+      id: 2,
+      jobTitle: 'Frontend Developer',
+      applicantName: 'Emily Johnson',
+      email: 'emily.johnson@example.com',
+      appliedDate: '2023-06-19',
+      status: 'shortlisted',
+      resumeUrl: '#',
+      coverLetter: 'With my 5 years of experience in frontend development...'
+    },
+    {
+      id: 3,
+      jobTitle: 'UX Designer',
+      applicantName: 'Michael Brown',
+      email: 'michael.brown@example.com',
+      appliedDate: '2023-06-18',
+      status: 'rejected',
+      resumeUrl: '#',
+      coverLetter: 'I believe my design skills would be a great fit...'
+    },
+    {
+      id: 4,
+      jobTitle: 'Backend Developer',
+      applicantName: 'Sarah Wilson',
+      email: 'sarah.wilson@example.com',
+      appliedDate: '2023-06-17',
+      status: 'pending',
+      resumeUrl: '#',
+      coverLetter: 'I am a backend developer with expertise in Node.js...'
+    },
+    {
+      id: 5,
+      jobTitle: 'Product Manager',
+      applicantName: 'David Lee',
+      email: 'david.lee@example.com',
+      appliedDate: '2023-06-16',
+      status: 'shortlisted',
+      resumeUrl: '#',
+      coverLetter: 'As a product manager with 7 years of experience...'
+    }
+  ]);
 
-  useEffect(() => {
-    // Fetch all jobs first
-    const fetchJobs = async () => {
-      try {
-        const response = await axios.get('/api/job/org');
-        setJobs(response.data);
-        
-        // If no jobId is provided in URL and we have jobs, select the first one
-        if (!selectedJobId && response.data.length > 0) {
-          setSelectedJobId(response.data[0]._id);
-        }
-      } catch (err) {
-        console.error('Error fetching jobs:', err);
-        setError('Failed to load jobs. Please try again.');
-      }
-    };
+  // State for filters and sorting
+  const [searchTerm, setSearchTerm] = useState('');
+  const [jobFilter, setJobFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [sortField, setSortField] = useState('appliedDate');
+  const [sortDirection, setSortDirection] = useState('desc');
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedApplication, setSelectedApplication] = useState(null);
 
-    fetchJobs();
-  }, [selectedJobId]);
+  // Get unique job titles for filter
+  const jobTitles = [...new Set(applications.map(app => app.jobTitle))];
 
-  useEffect(() => {
-    // Fetch applications for the selected job
-    const fetchApplications = async () => {
-      if (!selectedJobId) return;
-      
-      try {
-        setIsLoading(true);
-        const response = await axios.get(`/api/application/org/${selectedJobId}`);
-        setApplications(response.data);
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching applications:', err);
-        setError('Failed to load applications. Please try again.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchApplications();
-  }, [selectedJobId]);
-
-  const handleJobChange = (e) => {
-    setSelectedJobId(e.target.value);
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
   };
 
-  const handleStatusChange = async (applicationId, newStatus) => {
-    try {
-      await axios.post(`/api/application/${applicationId}/status`, { status: newStatus });
-      
-      // Update the application status in the state
-      setApplications(applications.map(app => 
-        app._id === applicationId ? { ...app, status: newStatus } : app
-      ));
-      
-      alert(`Application ${newStatus === 'shortlisted' ? 'shortlisted' : 'rejected'} successfully!`);
-    } catch (err) {
-      console.error('Error updating application status:', err);
-      alert('Failed to update application status. Please try again.');
+  // Handle job filter change
+  const handleJobFilterChange = (e) => {
+    setJobFilter(e.target.value);
+  };
+
+  // Handle status filter change
+  const handleStatusFilterChange = (e) => {
+    setStatusFilter(e.target.value);
+  };
+
+  // Handle sort change
+  const handleSortChange = (field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('desc');
     }
   };
 
+  // Toggle filters visibility
+  const toggleFilters = () => {
+    setShowFilters(!showFilters);
+  };
+
+  // View application details
+  const viewApplication = (application) => {
+    setSelectedApplication(application);
+  };
+
+  // Close application details modal
+  const closeApplicationDetails = () => {
+    setSelectedApplication(null);
+  };
+
+  // Update application status
+  const updateApplicationStatus = (id, newStatus) => {
+    setApplications(applications.map(app => 
+      app.id === id ? { ...app, status: newStatus } : app
+    ));
+    
+    // If the application is currently selected, update its status in the modal too
+    if (selectedApplication && selectedApplication.id === id) {
+      setSelectedApplication({ ...selectedApplication, status: newStatus });
+    }
+  };
+
+  // Filter and sort applications
+  const filteredApplications = applications
+    .filter(app => {
+      // Search term filter
+      const matchesSearch = app.applicantName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           app.email.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      // Job filter
+      const matchesJob = jobFilter === 'all' || app.jobTitle === jobFilter;
+      
+      // Status filter
+      const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
+      
+      return matchesSearch && matchesJob && matchesStatus;
+    })
+    .sort((a, b) => {
+      // Sort by selected field
+      if (a[sortField] < b[sortField]) {
+        return sortDirection === 'asc' ? -1 : 1;
+      }
+      if (a[sortField] > b[sortField]) {
+        return sortDirection === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+
+  // Function to format date
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  // Function to get status badge class
+  const getStatusBadgeClass = (status) => {
+    switch (status) {
+      case 'pending':
+        return 'status-badge pending';
+      case 'shortlisted':
+        return 'status-badge shortlisted';
+      case 'rejected':
+        return 'status-badge rejected';
+      default:
+        return 'status-badge';
+    }
+  };
+
+  // Function to get sort icon
+  const getSortIcon = (field) => {
+    if (sortField === field) {
+      return sortDirection === 'asc' ? <FaChevronUp /> : <FaChevronDown />;
+    }
+    return null;
+  };
+
   return (
-    <div>
-      <h1>Applications</h1>
-      
-      {error && <div className="alert alert-danger">{error}</div>}
-      
-      {jobs.length === 0 ? (
-        <div className="dashboard-card">
-          <p>You haven't posted any jobs yet.</p>
-          <Link to="/org/job/new" className="btn btn-primary">Post Your First Job</Link>
+    <Layout>
+      <div className="applications-container">
+        <div className="applications-header">
+          <h1>Applications</h1>
         </div>
-      ) : (
-        <div>
-          <div className="form-group" style={{ maxWidth: '400px', marginBottom: '20px' }}>
-            <label htmlFor="jobSelect">Select Job</label>
-            <select
-              id="jobSelect"
-              className="form-control"
-              value={selectedJobId}
-              onChange={handleJobChange}
-            >
-              <option value="">-- Select a job --</option>
-              {jobs.map(job => (
-                <option key={job._id} value={job._id}>
-                  {job.title}
-                </option>
-              ))}
-            </select>
+
+        <div className="applications-controls">
+          <div className="search-bar">
+            <FaSearch className="search-icon" />
+            <input
+              type="text"
+              placeholder="Search by applicant name or email..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
           </div>
-          
-          {selectedJobId ? (
-            isLoading ? (
-              <div>Loading applications...</div>
-            ) : applications.length === 0 ? (
-              <div className="dashboard-card">
-                <p>No applications received for this job yet.</p>
-              </div>
-            ) : (
-              <div>
-                <h2>
-                  {applications.length} Application{applications.length !== 1 ? 's' : ''} for {jobs.find(job => job._id === selectedJobId)?.title}
-                </h2>
-                
-                {applications.map(application => (
-                  <div key={application._id} className="application-card">
-                    <div className="applicant-info">
-                      <h3>{application.name}</h3>
-                      <p>{application.email}</p>
-                      {application.resume && (
-                        <p>
-                          <a href={application.resume} target="_blank" rel="noopener noreferrer">
-                            View Resume
-                          </a>
-                        </p>
-                      )}
-                    </div>
-                    
-                    <div className="application-actions">
-                      {application.status === 'pending' ? (
-                        <>
-                          <button 
-                            className="shortlist-btn"
-                            onClick={() => handleStatusChange(application._id, 'shortlisted')}
-                          >
-                            Shortlist
-                          </button>
-                          <button 
-                            className="reject-btn"
-                            onClick={() => handleStatusChange(application._id, 'rejected')}
-                          >
-                            Reject
-                          </button>
-                        </>
-                      ) : (
-                        <span className={`status-badge ${application.status}`}>
-                          {application.status === 'shortlisted' ? 'Shortlisted' : 'Rejected'}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )
-          ) : (
-            <div className="dashboard-card">
-              <p>Please select a job to view applications.</p>
-            </div>
-          )}
+
+          <button className="filter-toggle" onClick={toggleFilters}>
+            <FaFilter /> Filters {showFilters ? <FaChevronUp /> : <FaChevronDown />}
+          </button>
         </div>
-      )}
-    </div>
+
+        {showFilters && (
+          <div className="filter-panel">
+            <div className="filter-group">
+              <label>Job Title:</label>
+              <select value={jobFilter} onChange={handleJobFilterChange}>
+                <option value="all">All Jobs</option>
+                {jobTitles.map(title => (
+                  <option key={title} value={title}>{title}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="filter-group">
+              <label>Status:</label>
+              <select value={statusFilter} onChange={handleStatusFilterChange}>
+                <option value="all">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="shortlisted">Shortlisted</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
+          </div>
+        )}
+
+        <div className="applications-table-container">
+          <table className="applications-table">
+            <thead>
+              <tr>
+                <th onClick={() => handleSortChange('applicantName')}>
+                  Applicant {getSortIcon('applicantName')}
+                </th>
+                <th onClick={() => handleSortChange('jobTitle')}>
+                  Job Title {getSortIcon('jobTitle')}
+                </th>
+                <th onClick={() => handleSortChange('email')}>
+                  Email {getSortIcon('email')}
+                </th>
+                <th onClick={() => handleSortChange('appliedDate')}>
+                  Applied Date {getSortIcon('appliedDate')}
+                </th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredApplications.length > 0 ? (
+                filteredApplications.map(application => (
+                  <tr key={application.id}>
+                    <td>{application.applicantName}</td>
+                    <td>{application.jobTitle}</td>
+                    <td>{application.email}</td>
+                    <td>{formatDate(application.appliedDate)}</td>
+                    <td>
+                      <span className={getStatusBadgeClass(application.status)}>
+                        {application.status.charAt(0).toUpperCase() + application.status.slice(1)}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="action-buttons">
+                        <button 
+                          className="action-icon view" 
+                          title="View Application"
+                          onClick={() => viewApplication(application)}
+                        >
+                          <FaEye />
+                        </button>
+                        {application.status !== 'shortlisted' && (
+                          <button 
+                            className="action-icon shortlist" 
+                            title="Shortlist"
+                            onClick={() => updateApplicationStatus(application.id, 'shortlisted')}
+                          >
+                            <FaCheck />
+                          </button>
+                        )}
+                        {application.status !== 'rejected' && (
+                          <button 
+                            className="action-icon reject" 
+                            title="Reject"
+                            onClick={() => updateApplicationStatus(application.id, 'rejected')}
+                          >
+                            <FaTimes />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" className="no-applications-message">
+                    No applications found matching your criteria.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Application Details Modal */}
+        {selectedApplication && (
+          <div className="application-modal-overlay">
+            <div className="application-modal">
+              <div className="modal-header">
+                <h2>Application Details</h2>
+                <button className="close-modal" onClick={closeApplicationDetails}>&times;</button>
+              </div>
+              <div className="modal-content">
+                <div className="applicant-info">
+                  <h3>{selectedApplication.applicantName}</h3>
+                  <p className="applicant-email">{selectedApplication.email}</p>
+                  <p className="application-meta">
+                    Applied for <strong>{selectedApplication.jobTitle}</strong> on {formatDate(selectedApplication.appliedDate)}
+                  </p>
+                  <div className="application-status">
+                    <span className={getStatusBadgeClass(selectedApplication.status)}>
+                      {selectedApplication.status.charAt(0).toUpperCase() + selectedApplication.status.slice(1)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="application-section">
+                  <h4>Cover Letter</h4>
+                  <div className="cover-letter">
+                    <p>{selectedApplication.coverLetter}</p>
+                  </div>
+                </div>
+
+                <div className="application-section">
+                  <h4>Resume</h4>
+                  <div className="resume-actions">
+                    <a href={selectedApplication.resumeUrl} className="resume-link" target="_blank" rel="noopener noreferrer">
+                      View Resume
+                    </a>
+                    <a href={selectedApplication.resumeUrl} className="resume-link" download>
+                      Download Resume
+                    </a>
+                  </div>
+                </div>
+
+                <div className="application-actions">
+                  {selectedApplication.status !== 'shortlisted' && (
+                    <button 
+                      className="action-button shortlist"
+                      onClick={() => updateApplicationStatus(selectedApplication.id, 'shortlisted')}
+                    >
+                      <FaCheck /> Shortlist Candidate
+                    </button>
+                  )}
+                  {selectedApplication.status !== 'rejected' && (
+                    <button 
+                      className="action-button reject"
+                      onClick={() => updateApplicationStatus(selectedApplication.id, 'rejected')}
+                    >
+                      <FaTimes /> Reject Application
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </Layout>
   );
 };
 
