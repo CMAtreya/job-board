@@ -1,0 +1,82 @@
+/* Main container */
+.job-details-container {
+  display: flex;
+  flex-direction: column;
+  background-color: #e6f2f0; /* light teal background */
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  color: #0f3e3e;
+  max-width: 1200px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Header */
+.job-details-header {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #00695c; /* teal shade */
+}
+
+/* Labels and fields */
+.job-details-label {
+  font-weight: 600;
+  color: #004d40;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.job-details-field {
+  background-color: white;
+  border: 1px solid #b2dfdb;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  color: #004d40;
+  transition: border-color 0.3s ease;
+  width: 100%;
+}
+
+.job-details-field:focus {
+  outline: none;
+  border-color: #00796b;
+  box-shadow: 0 0 0 2px rgba(0, 150, 136, 0.2);
+  width: 100% ;
+}
+
+/* Buttons */
+.job-action-button {
+  margin-top: 2rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #00796b;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.job-action-button:hover {
+  background-color: #004d40;
+}
+
+/* Section divider */
+.job-section-divider {
+  height: 2px;
+  background-color: #b2dfdb;
+  margin: 2rem 0;
+  border-radius: 2px;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .job-details-container {
+    padding: 1rem;
+  }
+
+  .job-details-header {
+    font-size: 1.5rem;
+  }
+}

@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import '../../styles/auth/landingpage.css'; // Import your CSS file here
+<<<<<<< HEAD
 import { Link } from 'react-router-dom';
+=======
+>>>>>>> ac05377677afe830f53796bbfb03b2e2eaac7ecd
 
 // Header Component
 const Header = () => {
