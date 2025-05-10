@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './Dashboard';
 import Profile from './Profile';
 import JobManagement from './JobManagement';
@@ -8,13 +8,16 @@ import EditJob from './editjob';
 import DeleteJob from './deletejob';
 import JobApplicants from './JobApplicants';
 import Register from './register';
+import Login from './login';
 
 export default function Orgapp() {
   return (
     <Router>
       <div className="org-app-container">
         <Routes>
-          <Route path="/" element={<Register />} />
+          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/jobmangement" element={<JobManagement />} />

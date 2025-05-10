@@ -1,68 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FaPlus, FaEdit, FaTrash, FaEye, FaFilter, FaSearch, FaSort, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import Layout from './components/Layout';
 import '../../styles/org/jobmanagement.css';
+import axios from 'axios';
 
 const JobManagement = () => {
-  // Mock data - in a real app, this would come from API
-  const [jobs, setJobs] = useState([
-    {
-      id: 1,
-      title: 'Frontend Developer',
-      location: 'New York, NY',
-      type: 'Full-time',
-      status: 'active',
-      applications: 12,
-      views: 145,
-      postedDate: '2023-06-15',
-      expiryDate: '2023-07-15'
-    },
-    {
-      id: 2,
-      title: 'UX Designer',
-      location: 'Remote',
-      type: 'Contract',
-      status: 'active',
-      applications: 8,
-      views: 98,
-      postedDate: '2023-06-18',
-      expiryDate: '2023-07-18'
-    },
-    {
-      id: 3,
-      title: 'Backend Developer',
-      location: 'San Francisco, CA',
-      type: 'Full-time',
-      status: 'active',
-      applications: 15,
-      views: 210,
-      postedDate: '2023-06-10',
-      expiryDate: '2023-07-10'
-    },
-    {
-      id: 4,
-      title: 'Product Manager',
-      location: 'Chicago, IL',
-      type: 'Full-time',
-      status: 'active',
-      applications: 20,
-      views: 180,
-      postedDate: '2023-06-05',
-      expiryDate: '2023-07-05'
-    },
-    {
-      id: 5,
-      title: 'DevOps Engineer',
-      location: 'Remote',
-      type: 'Full-time',
-      status: 'expired',
-      applications: 6,
-      views: 75,
-      postedDate: '2023-05-15',
-      expiryDate: '2023-06-15'
-    }
-  ]);
+  // State for jobs data
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // State for filters and sorting
   const [searchTerm, setSearchTerm] = useState('');
@@ -71,6 +18,44 @@ const JobManagement = () => {
   const [sortField, setSortField] = useState('postedDate');
   const [sortDirection, setSortDirection] = useState('desc');
   const [showFilters, setShowFilters] = useState(false);
+
+  // Fetch jobs from API
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:5001/api/org/jobs', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        // Transform data if needed to match our component's expected format
+        const formattedJobs = response.data.map(job => ({
+          id: job._id,
+          title: job.title,
+          location: job.location,
+          type: job.type,
+          status: job.status || 'active',
+          applications: job.applications?.length || 0,
+          views: job.views || 0,
+          postedDate: job.createdAt,
+          expiryDate: job.expiryDate
+        }));
+        
+        setJobs(formattedJobs);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching jobs:', err);
+        setError('Failed to load jobs. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, []);
 
   // Handle search input change
   const handleSearchChange = (e) => {
@@ -102,6 +87,26 @@ const JobManagement = () => {
     setShowFilters(!showFilters);
   };
 
+  // Handle job deletion
+  const handleDeleteJob = async (jobId) => {
+    if (window.confirm('Are you sure you want to delete this job?')) {
+      try {
+        const token = localStorage.getItem('token');
+        await axios.delete(`http://localhost:5000/api/org/job/${jobId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        // Remove job from state
+        setJobs(jobs.filter(job => job.id !== jobId));
+      } catch (err) {
+        console.error('Error deleting job:', err);
+        alert('Failed to delete job. Please try again.');
+      }
+    }
+  };
+
   // Filter and sort jobs
   const filteredJobs = jobs
     .filter(job => {
@@ -130,6 +135,7 @@ const JobManagement = () => {
 
   // Function to format date
   const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
@@ -143,6 +149,8 @@ const JobManagement = () => {
         return 'status-badge expired';
       case 'draft':
         return 'status-badge draft';
+      case 'closed':
+        return 'status-badge expired';
       default:
         return 'status-badge';
     }
@@ -161,10 +169,16 @@ const JobManagement = () => {
       <div className="job-management-container">
         <div className="job-management-header">
           <h1>Job Management</h1>
-          <Link to="/job/new" className="action-button primary">
+          <Link to="/createjob" className="action-button primary">
             <FaPlus /> Post New Job
           </Link>
         </div>
+
+        {error && (
+          <div className="error-message" style={{ padding: '1rem', marginBottom: '1rem', backgroundColor: '#ffebee', color: '#c62828', borderRadius: '4px' }}>
+            {error}
+          </div>
+        )}
 
         <div className="job-management-controls">
           <div className="search-bar">
@@ -191,6 +205,7 @@ const JobManagement = () => {
                 <option value="active">Active</option>
                 <option value="expired">Expired</option>
                 <option value="draft">Draft</option>
+                <option value="closed">Closed</option>
               </select>
             </div>
 
@@ -198,84 +213,97 @@ const JobManagement = () => {
               <label>Job Type:</label>
               <select value={typeFilter} onChange={handleTypeFilterChange}>
                 <option value="all">All Types</option>
-                <option value="Full-time">Full-time</option>
-                <option value="Part-time">Part-time</option>
-                <option value="Contract">Contract</option>
-                <option value="Internship">Internship</option>
+                <option value="full-time">Full-time</option>
+                <option value="part-time">Part-time</option>
+                <option value="contract">Contract</option>
+                <option value="internship">Internship</option>
+                <option value="remote">Remote</option>
               </select>
             </div>
           </div>
         )}
 
         <div className="job-table-container">
-          <table className="job-table">
-            <thead>
-              <tr>
-                <th onClick={() => handleSortChange('title')}>
-                  Job Title {getSortIcon('title')}
-                </th>
-                <th onClick={() => handleSortChange('location')}>
-                  Location {getSortIcon('location')}
-                </th>
-                <th onClick={() => handleSortChange('type')}>
-                  Type {getSortIcon('type')}
-                </th>
-                <th onClick={() => handleSortChange('applications')}>
-                  Applications {getSortIcon('applications')}
-                </th>
-                <th onClick={() => handleSortChange('views')}>
-                  Views {getSortIcon('views')}
-                </th>
-                <th onClick={() => handleSortChange('postedDate')}>
-                  Posted Date {getSortIcon('postedDate')}
-                </th>
-                <th onClick={() => handleSortChange('expiryDate')}>
-                  Expiry Date {getSortIcon('expiryDate')}
-                </th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredJobs.length > 0 ? (
-                filteredJobs.map(job => (
-                  <tr key={job.id}>
-                    <td>{job.title}</td>
-                    <td>{job.location}</td>
-                    <td>{job.type}</td>
-                    <td>{job.applications}</td>
-                    <td>{job.views}</td>
-                    <td>{formatDate(job.postedDate)}</td>
-                    <td>{formatDate(job.expiryDate)}</td>
-                    <td>
-                      <span className={getStatusBadgeClass(job.status)}>
-                        {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="action-buttons">
-                        <Link to={`/job/${job.id}`} className="action-icon view" title="View Job">
-                          <FaEye />
-                        </Link>
-                        <Link to={`/job/${job.id}/edit`} className="action-icon edit" title="Edit Job">
-                          <FaEdit />
-                        </Link>
-                        <button className="action-icon delete" title="Delete Job">
-                          <FaTrash />
-                        </button>
-                      </div>
+          {loading ? (
+            <div className="loading-message" style={{ padding: '2rem', textAlign: 'center' }}>
+              Loading jobs...
+            </div>
+          ) : (
+            <table className="job-table">
+              <thead>
+                <tr>
+                  <th onClick={() => handleSortChange('title')}>
+                    Job Title {getSortIcon('title')}
+                  </th>
+                  <th onClick={() => handleSortChange('location')}>
+                    Location {getSortIcon('location')}
+                  </th>
+                  <th onClick={() => handleSortChange('type')}>
+                    Type {getSortIcon('type')}
+                  </th>
+                  <th onClick={() => handleSortChange('applications')}>
+                    Applications {getSortIcon('applications')}
+                  </th>
+                  <th onClick={() => handleSortChange('views')}>
+                    Views {getSortIcon('views')}
+                  </th>
+                  <th onClick={() => handleSortChange('postedDate')}>
+                    Posted Date {getSortIcon('postedDate')}
+                  </th>
+                  <th onClick={() => handleSortChange('expiryDate')}>
+                    Expiry Date {getSortIcon('expiryDate')}
+                  </th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredJobs.length > 0 ? (
+                  filteredJobs.map(job => (
+                    <tr key={job.id}>
+                      <td>{job.title}</td>
+                      <td>{job.location}</td>
+                      <td>{job.type}</td>
+                      <td>{job.applications}</td>
+                      <td>{job.views}</td>
+                      <td>{formatDate(job.postedDate)}</td>
+                      <td>{formatDate(job.expiryDate)}</td>
+                      <td>
+                        <span className={getStatusBadgeClass(job.status)}>
+                          {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="action-buttons">
+                          <Link to={`/job-applicants/${job.id}`} className="action-icon view" title="View Applicants">
+                            <FaEye />
+                          </Link>
+                          <Link to={`/editjob/${job.id}`} className="action-icon edit" title="Edit Job">
+                            <FaEdit />
+                          </Link>
+                          <button 
+                            className="action-icon delete" 
+                            title="Delete Job"
+                            onClick={() => handleDeleteJob(job.id)}
+                          >
+                            <FaTrash />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="9" className="no-jobs-message">
+                      {searchTerm || statusFilter !== 'all' || typeFilter !== 'all' 
+                        ? 'No jobs found matching your criteria.'
+                        : 'No jobs found. Click "Post New Job" to create your first job listing.'}
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="9" className="no-jobs-message">
-                    No jobs found matching your criteria.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </Layout>

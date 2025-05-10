@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import '../../styles/org/register.css';
+import axios from 'axios';
 
 const Register = () => {
   // State for form data
@@ -129,27 +130,52 @@ const Register = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (validateForm()) {
-      // Here you would typically send the data to your backend
-      console.log('Form submitted:', formData);
-      alert('Registration successful! Check console for form data.');
-      
-      // You can add API call to submit the form data here
-      // Example:
-      // const formDataToSend = new FormData();
-      // Object.keys(formData).forEach(key => {
-      //   formDataToSend.append(key, formData[key]);
-      // });
-      // fetch('/api/register', {
-      //   method: 'POST',
-      //   body: formDataToSend
-      // })
-      // .then(response => response.json())
-      // .then(data => console.log('Success:', data))
-      // .catch(error => console.error('Error:', error));
+      try {
+        // Set loading state if needed
+        // setIsSubmitting(true);
+        
+        // Prepare data for API
+        const registrationData = {
+          name: formData.companyName,
+          email: formData.email,
+          password: formData.password,
+          logo: formData.logo ? formData.logo : null,
+          description: formData.description,
+          website: formData.websiteUrl, // Map websiteUrl to website
+          location: formData.location,
+          industry: formData.industryType, // Map industryType to industry
+          size: formData.companySize, // Map companySize to size
+          foundedYear: formData.foundedYear ? parseInt(formData.foundedYear) : null
+        };
+        
+        console.log('Sending registration data:', registrationData);
+        
+        // Send registration request to backend
+        const response = await axios.post('http://localhost:5001/api/org/register', registrationData);
+        
+        console.log('Registration successful:', response.data);
+        
+        // Store token in localStorage and sessionStorage is no longer needed here
+        // since we're redirecting to login page instead of dashboard
+        
+        // Show success message
+        alert('Registration successful! Please login with your credentials.');
+        
+        // Redirect to login page instead of dashboard
+        window.location.href = '/';
+      } catch (error) {
+        console.error('Registration error:', error.response?.data || error.message);
+        
+        // Handle API errors - you might want to show these to the user
+        alert(`Registration failed: ${error.response?.data?.message || 'Please try again later'}`);
+      } finally {
+        // Reset loading state if needed
+        // setIsSubmitting(false);
+      }
     }
   };
 
@@ -199,8 +225,8 @@ const Register = () => {
                 onChange={handleChange}
                 className={errors.password ? 'error' : ''}
               />
-              {errors.password && <span className="error-message">{errors.password}</span>}
-              <small>Must be at least 8 characters long</small>
+              {errors.password ? <span className="error-message">{errors.password}</span> : 
+                <small>Password must be at least 8 characters long</small>}
             </div>
             
             <div className="form-group">
@@ -332,6 +358,10 @@ const Register = () => {
           
           <div className="form-actions">
             <button type="submit" className="register-button">Register Organization</button>
+          </div>
+          
+          <div style={{ textAlign: 'center', marginTop: '20px' }}>
+            <p>Already have an account? <a href="/login" style={{ color: '#00897b', fontWeight: '500' }}>Sign in here</a></p>
           </div>
         </form>
       </div>

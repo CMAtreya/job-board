@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaSave, FaTimes, FaBriefcase, FaMapMarkerAlt, FaCalendarAlt, FaTags } from 'react-icons/fa';
 import Layout from './components/Layout';
 import '../../styles/org/jobform.css';
+import axios from 'axios';
 
 const CreateJob = () => {
   const navigate = useNavigate();
@@ -23,13 +24,16 @@ const CreateJob = () => {
   // State for form validation
   const [errors, setErrors] = useState({});
   
+  // State for loading status
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   // Job types options
   const jobTypes = [
-    { value: 'full-time', label: 'Full-time' },
-    { value: 'part-time', label: 'Part-time' },
-    { value: 'contract', label: 'Contract' },
-    { value: 'internship', label: 'Internship' },
-    { value: 'remote', label: 'Remote' }
+    { value: 'Full-Time', label: 'Full-time' },
+    { value: 'Part-Time', label: 'Part-time' },
+    { value: 'Contract', label: 'Contract' },
+    { value: 'Freelance', label: 'Freelance' },
+    { value: 'Internship', label: 'Internship' }
   ];
   
   // Experience level options
@@ -69,7 +73,7 @@ const CreateJob = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     // Validate form
@@ -87,14 +91,66 @@ const CreateJob = () => {
       return;
     }
     
-    // Submit form data
-    console.log('Submitting job data:', formData);
-    
-    // Redirect to jobs management page after successful submission
-    navigate('/org/jobs');
+    try {
+      setIsSubmitting(true);
+      
+      // Prepare data for API
+      const jobData = {
+        title: formData.title,
+        description: formData.description,
+        location: formData.location,
+        type: formData.type,
+        salary: formData.salary,
+        tags: formData.skills, // Backend expects tags instead of skills
+        experience: formData.experience,
+        expiryDate: formData.expiryDate,
+        status: formData.status
+      };
+      
+      // Print form data in console
+      console.log('Form Data:', formData);
+      console.log('Job Data being sent to API:', jobData);
+      
+      // Get token from localStorage and sessionStorage as fallback
+      let token = localStorage.getItem('token');
+      if (!token) {
+        token = sessionStorage.getItem('token');
+        console.log('Token retrieved from sessionStorage');
+      }
+      
+      console.log('Authorization Token:', token ? 'Token exists' : 'No token found');
+      
+      if (!token) {
+        alert('Authentication token not found. Please login again.');
+        navigate('/login');
+        return;
+      }
+      
+      console.log('Sending request to:', 'http://localhost:5001/api/org/job');
+      const response = await axios.post('http://localhost:5001/api/org/job', jobData, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      console.log('API Response:', response);
+      console.log('Job created successfully:', response.data);
+      
+      // Redirect to jobs management page after successful submission
+      navigate('/jobmangement');
+    } catch (error) {
+      console.error('Error creating job:', error.response?.data || error.message);
+      // Handle API errors
+      if (error.response?.data?.message) {
+        alert(`Error: ${error.response.data.message}`);
+      } else {
+        alert('Failed to create job. Please try again.');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
-
-
 
   return (
     <Layout>
@@ -102,7 +158,7 @@ const CreateJob = () => {
         <div className="job-form-header">
           <button 
             className="back-button" 
-            onClick={() => navigate('/org/jobs')}
+            onClick={() => navigate('/jobmangement')}
           >
             <FaArrowLeft /> Back to Jobs
           </button>
@@ -271,12 +327,17 @@ const CreateJob = () => {
             <button 
               type="button" 
               className="button cancel-button"
-              onClick={() => navigate('/org/jobs')}
+              onClick={() => navigate('/jobmangement')}
+              disabled={isSubmitting}
             >
               <FaTimes /> Cancel
             </button>
-            <button type="submit" className="button submit-button">
-              <FaSave /> Save Job
+            <button 
+              type="submit" 
+              className="button submit-button"
+              disabled={isSubmitting}
+            >
+              <FaSave /> {isSubmitting ? 'Saving...' : 'Save Job'}
             </button>
           </div>
         </form>

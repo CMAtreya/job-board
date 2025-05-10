@@ -1,14 +1,25 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaHome, FaUser, FaBriefcase, FaPlus, FaChartBar, FaSignOutAlt } from 'react-icons/fa';
 import '../../../styles/org/layout.css';
 
 const Layout = ({ children }) => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Function to check if a path is active
   const isActive = (path) => {
     return location.pathname === path;
+  };
+  
+  // Handle logout
+  const handleLogout = () => {
+    // Clear authentication tokens
+    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
+    
+    // Redirect to login page
+    navigate('/login');
   };
 
   return (
@@ -55,10 +66,10 @@ const Layout = ({ children }) => {
         </nav>
         
         <div className="sidebar-footer">
-          <Link to="/" className="logout-btn">
+          <button onClick={handleLogout} className="logout-btn">
             <FaSignOutAlt className="nav-icon" />
             <span>Logout</span>
-          </Link>
+          </button>
         </div>
       </div>
       

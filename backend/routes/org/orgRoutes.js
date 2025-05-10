@@ -30,14 +30,38 @@ const authOrg = async (req, res, next) => {
   }
 };
 
+
 // Organization registration
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { 
+      name, 
+      email, 
+      password, 
+      logo, 
+      description, 
+      website, // from websiteUrl in frontend
+      location, 
+      industry, // from industryType in frontend
+      size, // from companySize in frontend
+      foundedYear 
+    } = req.body;
+    
+    console.log('Registration request received:', { 
+      name, 
+      email, 
+      description, 
+      website, 
+      location, 
+      industry, 
+      size, 
+      foundedYear 
+    });
     
     // Check if organization already exists
     const existingOrg = await Organization.findOne({ email });
     if (existingOrg) {
+      console.log('Registration failed: Organization already exists with email:', email);
       return res.status(400).json({ message: 'Organization with this email already exists' });
     }
     
@@ -45,20 +69,85 @@ router.post('/register', async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     
-    // Create new organization
+    // Create new organization with all fields
     const organization = new Organization({
       name,
       email,
-      password: hashedPassword
+      password: hashedPassword,
+      logo: logo || '',
+      description: description || '',
+      website: website || '',
+      location: location || '',
+      industry: industry || '',
+      size: size || '1-10',
+      foundedYear: foundedYear || null
     });
     
     await organization.save();
+    console.log('Organization saved to database:', { 
+      id: organization._id, 
+      name, 
+      email,
+      description,
+      website,
+      location,
+      industry,
+      size,
+      foundedYear
+    });
     
     // Generate JWT token
     const token = jwt.sign({ id: organization._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    console.log('JWT token generated for organization');
     
     res.status(201).json({
       message: 'Organization registered successfully',
+      token,
+      organization: {
+        id: organization._id,
+        name: organization.name,
+        email: organization.email,
+        description: organization.description,
+        website: organization.website,
+        location: organization.location,
+        industry: organization.industry,
+        size: organization.size,
+        foundedYear: organization.foundedYear
+      }
+    });
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ message: 'Registration failed', error: error.message });
+  }
+});
+
+// Organization login
+router.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    console.log('Login attempt for:', email);
+    
+    // Check if organization exists
+    const organization = await Organization.findOne({ email });
+    if (!organization) {
+      console.log('Login failed: Organization not found with email:', email);
+      return res.status(400).json({ message: 'Invalid email or password' });
+    }
+    
+    // Verify password
+    const isMatch = await bcrypt.compare(password, organization.password);
+    if (!isMatch) {
+      console.log('Login failed: Invalid password for organization:', email);
+      return res.status(400).json({ message: 'Invalid email or password' });
+    }
+    
+    // Generate JWT token
+    const token = jwt.sign({ id: organization._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    console.log('Login successful for organization:', { id: organization._id, name: organization.name, email });
+    console.log('JWT token generated for organization');
+    
+    res.json({
+      message: 'Login successful',
       token,
       organization: {
         id: organization._id,
@@ -67,10 +156,10 @@ router.post('/register', async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({ message: 'Registration failed', error: error.message });
+    console.error('Login error:', error);
+    res.status(500).json({ message: 'Login failed', error: error.message });
   }
 });
-
 
 // Get organization profile
 router.get('/profile', authOrg, async (req, res) => {
