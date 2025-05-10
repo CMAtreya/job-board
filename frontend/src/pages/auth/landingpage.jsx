@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import '../../styles/auth/landingpage.css' // Import your CSS file here
+import '../../styles/auth/landingpage.css'; // Import your CSS file here
+import { Link } from 'react-router-dom';
 
 // Header Component
 const Header = () => {
@@ -28,7 +29,7 @@ const Header = () => {
   return (
     <header className={scrolled ? 'scrolled' : ''}>
       <div className="container">
-        <div className="logo">Job Portal</div> 
+        <Link to="/" className="logo">Job Portal</Link> 
         <div className={`mobile-menu-icon ${mobileMenuOpen ? 'active' : ''}`} onClick={toggleMobileMenu}>
           <span></span>
           <span></span>
@@ -36,16 +37,16 @@ const Header = () => {
         </div>
         <nav className={mobileMenuOpen ? 'active' : ''}>
           <ul>
-            <li><a href="#" className="active">Home</a></li>
-            <li><a href="#">Browse Jobs</a></li>
-            <li><a href="#">Post a Job</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Contact</a></li>
+            <li><Link to="/" className="active">Home</Link></li>
+            <li><Link to="/sign-in">Browse Jobs</Link></li>
+            <li><Link to="/sign-in">Post a Job</Link></li>
+            <li><Link to="/sign-in">About</Link></li>
+            <li><Link to="/sign-in">Contact</Link></li>
           </ul>
         </nav>
         <div className="auth-buttons">
-          <a href="#" className="btn btn-outline">Sign In</a>
-          <a href="#" className="btn btn-primary">Sign Up</a>
+          <Link to="/sign-in" className="btn btn-outline">Sign In</Link>
+          <Link to="/sign-in" className="btn btn-primary">Sign Up</Link>
         </div>
       </div>
     </header>
@@ -90,7 +91,7 @@ const Hero = () => {
               <i className="fas fa-map-marker-alt"></i>
               <input type="text" placeholder="Location" />
             </div>
-            <button className="btn btn-primary search-btn">Search Jobs</button>
+            <Link to="/sign-in" className="btn btn-primary search-btn">Search Jobs</Link>
           </div>
         </div>
       </div>
@@ -158,7 +159,7 @@ const JobCard = ({ job }) => {
         <p><i className="fas fa-clock"></i> {job.type}</p>
         <p><i className="fas fa-money-bill-wave"></i> {job.salary}</p>
       </div>
-      <a href="#" className="btn btn-outline-small">View Details</a>
+      <Link to="/sign-in" className="btn btn-outline-small">View Details</Link>
     </div>
   );
 };
@@ -210,7 +211,7 @@ const FeaturedJobs = () => {
           ))}
         </div>
         <div className="view-all-jobs">
-          <a href="#" className="btn btn-outline">View All Jobs</a>
+          <Link to="/sign-in" className="btn btn-outline">View All Jobs</Link>
         </div>
       </div>
     </section>
@@ -248,11 +249,11 @@ const HowItWorks = () => {
         <h2>How It Works</h2>
         <div className="steps-grid">
           {steps.map(step => (
-            <div key={step.id} className="step-card">
+            <Link to="/sign-in" key={step.id} className="step-card">
               <div className="step-number">{step.id}</div>
               <h3>{step.title}</h3>
               <p>{step.description}</p>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
@@ -269,29 +270,29 @@ const Footer = () => {
           <div className="footer-section">
             <p>Find your dream job with our platform. We connect talented professionals with top companies.</p>
             <div className="social-icons">
-              <a href="#"><i className="fab fa-facebook-f"></i></a>
-              <a href="#"><i className="fab fa-twitter"></i></a>
-              <a href="#"><i className="fab fa-linkedin-in"></i></a>
-              <a href="#"><i className="fab fa-instagram"></i></a>
+              <Link to="/sign-in"><i className="fab fa-facebook-f"></i></Link>
+              <Link to="/sign-in"><i className="fab fa-twitter"></i></Link>
+              <Link to="/sign-in"><i className="fab fa-linkedin-in"></i></Link>
+              <Link to="/sign-in"><i className="fab fa-instagram"></i></Link>
             </div>
           </div>
           <div className="footer-section">
             <h3>Quick Links</h3>
             <ul>
-              <li><a href="#">Home</a></li>
-              <li><a href="#">Browse Jobs</a></li>
-              <li><a href="#">Post a Job</a></li>
-              <li><a href="#">About Us</a></li>
-              <li><a href="#">Contact</a></li>
+              <li><Link to="/">Home</Link></li>
+              <li><Link to="/sign-in">Browse Jobs</Link></li>
+              <li><Link to="/sign-in">Post a Job</Link></li>
+              <li><Link to="/sign-in">About Us</Link></li>
+              <li><Link to="/sign-in">Contact</Link></li>
             </ul>
           </div>
           <div className="footer-section">
             <h3>For Employers</h3>
             <ul>
-              <li><a href="#">Post a Job</a></li>
-              <li><a href="#">Browse Candidates</a></li>
-              <li><a href="#">Pricing Plans</a></li>
-              <li><a href="#">Featured Jobs</a></li>
+              <li><Link to="/sign-in">Post a Job</Link></li>
+              <li><Link to="/sign-in">Browse Candidates</Link></li>
+              <li><Link to="/sign-in">Pricing Plans</Link></li>
+              <li><Link to="/sign-in">Featured Jobs</Link></li>
             </ul>
           </div>
           <div className="footer-section">
@@ -309,8 +310,8 @@ const Footer = () => {
   );
 };
 
-// Main App Component
-function App() {
+// Main LandingPage Component
+function LandingPage() {
   return (
     <div className="app">
       <Header />
@@ -323,4 +324,4 @@ function App() {
   );
 }
 
-export default App;
+export default LandingPage;
