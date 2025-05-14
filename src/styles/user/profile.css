@@ -1,0 +1,484 @@
+/* Profile Container */
+.profile-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Profile Header */
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  position: relative;
+}
+
+.back-button {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: #00a8a8;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  transition: color 0.3s;
+}
+
+.back-button:hover {
+  color: #008080;
+}
+
+.profile-header h1 {
+  color: #333;
+  margin: 0 auto;
+  font-size: 24px;
+}
+
+/* Profile Completion */
+.profile-completion {
+  width: 200px;
+}
+
+.progress-container {
+  height: 8px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #00a8a8; /* Teal color to match theme */
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* Profile Content */
+.profile-content {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* Profile Sections */
+.profile-section {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.profile-section h2 {
+  color: #00a8a8; /* Teal color to match theme */
+  margin-top: 0;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+  font-size: 20px;
+}
+
+.subsection {
+  margin-bottom: 25px;
+}
+
+.subsection h3 {
+  color: #444;
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+
+/* Form Groups */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #555;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.form-group input.error {
+  border-color: #ff3860;
+}
+
+.error-message {
+  color: #ff3860;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.help-text {
+  color: #777;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+/* Form Rows */
+.form-row {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.form-row .form-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+/* Profile Picture */
+.profile-picture-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.profile-picture {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #00a8a8; /* Teal color to match theme */
+}
+
+.profile-picture-placeholder {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 50px;
+  color: #ccc;
+  border: 3px solid #eee;
+}
+
+.profile-picture-upload {
+  margin-top: 10px;
+}
+
+.upload-button {
+  display: inline-block;
+  padding: 8px 15px;
+  background-color: #00a8a8; /* Teal color to match theme */
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.upload-button:hover {
+  background-color: #008080;
+}
+
+/* Skills */
+.skills-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.skill-tag {
+  background-color: #e0f7fa;
+  color: #00a8a8;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+/* Education, Work Experience, Projects */
+.education-item,
+.work-experience-item,
+.project-item {
+  position: relative;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.education-details,
+.work-experience-details,
+.project-details {
+  padding: 5px 0;
+}
+
+.education-degree,
+.work-header h4 {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.education-institution,
+.work-company {
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.education-year,
+.work-duration {
+  color: #777;
+  font-size: 14px;
+}
+
+.work-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.work-description {
+  margin-top: 10px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.project-details h4 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.project-link {
+  display: inline-flex;
+  align-items: center;
+  color: #00a8a8;
+  text-decoration: none;
+  font-size: 14px;
+  gap: 5px;
+}
+
+.project-link:hover {
+  text-decoration: underline;
+}
+
+/* Resume */
+.resume-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.resume-filename {
+  font-size: 14px;
+  color: #555;
+}
+
+.resume-display {
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.resume-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.resume-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.view-button,
+.download-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.view-button {
+  background-color: #e0f7fa;
+  color: #00a8a8;
+}
+
+.download-button {
+  background-color: #00a8a8;
+  color: white;
+}
+
+.view-button:hover {
+  background-color: #b2ebf2;
+}
+
+.download-button:hover {
+  background-color: #008080;
+}
+
+/* Social Links */
+.social-links {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.social-links .form-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.social-links a {
+  color: #00a8a8;
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.social-links a:hover {
+  text-decoration: underline;
+}
+
+/* Action Buttons */
+.profile-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.btn-edit,
+.btn-save,
+.btn-cancel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-edit {
+  background-color: #00a8a8;
+  color: white;
+}
+
+.btn-save {
+  background-color: #00a8a8;
+  color: white;
+}
+
+.btn-cancel {
+  background-color: #f0f0f0;
+  color: #555;
+}
+
+.btn-edit:hover,
+.btn-save:hover {
+  background-color: #008080;
+}
+
+.btn-cancel:hover {
+  background-color: #e0e0e0;
+}
+
+/* Add and Remove Buttons */
+.add-button,
+.remove-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.add-button {
+  background-color: #e0f7fa;
+  color: #00a8a8;
+}
+
+.remove-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 5px;
+  background-color: transparent;
+  color: #ff3860;
+}
+
+.add-button:hover {
+  background-color: #b2ebf2;
+}
+
+.remove-button:hover {
+  color: #ff1744;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .profile-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .profile-completion {
+    width: 100%;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .resume-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .profile-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .btn-edit,
+  .btn-save,
+  .btn-cancel {
+    width: 100%;
+    justify-content: center;
+  }
+}
